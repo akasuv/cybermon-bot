@@ -58,7 +58,7 @@ bot.command("start", (ctx) => __awaiter(void 0, void 0, void 0, function* () {
         ctx.reply(`Bukle up! You're about to start your adventure on Cyberland!`);
         const res = yield linkTelegramWithAddress(tgId, address);
         if (res.success) {
-            ctx.reply("Binding successful!");
+            ctx.reply("✅ Account linked successfully!");
         }
         else {
             ctx.reply(res.msg);
@@ -99,11 +99,11 @@ bot.command("feed", (ctx) => __awaiter(void 0, void 0, void 0, function* () {
             const feedRes = yield feedCybermon(cybermon.id);
             console.log("feedres", feedRes);
             if (feedRes.data.feed_success) {
-                ctx.reply("😋 Yum yum");
                 const cybermon = feedRes.data.cybermon;
                 yield ctx.replyWithPhoto(cybermon.picture, {
                     caption: `Name: ${cybermon.name}\nLevel: ${cybermon.level}\nEnergy: ${cybermon.energy}\n`,
                 });
+                ctx.reply("😋 Yum yum");
             }
         }
     }

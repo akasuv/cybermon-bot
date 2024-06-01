@@ -52,7 +52,7 @@ bot.command("start", async (ctx) => {
     ctx.reply(`Bukle up! You're about to start your adventure on Cyberland!`);
     const res = await linkTelegramWithAddress(tgId, address);
     if (res.success) {
-      ctx.reply("Binding successful!");
+      ctx.reply("✅ Account linked successfully!");
     } else {
       ctx.reply(res.msg);
     }
