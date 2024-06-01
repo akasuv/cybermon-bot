@@ -33,19 +33,29 @@ const checkCybermon = (tgId) => __awaiter(void 0, void 0, void 0, function* () {
     })
         .catch((err) => console.log(err));
 });
+const feedCybermon = (cybermonId) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log("feeding cybermon", cybermonId);
+    return yield fetch(`${apiUrl}/cybermon/feed`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ cybermon_id: cybermonId }),
+    })
+        .then((res) => {
+        console.log("feeding", res);
+        return res.json();
+    })
+        .catch((err) => console.log(err));
+});
 // Create an instance of the `Bot` class and pass your bot token to it.
 const bot = new grammy_1.Bot("7304581316:AAGTAmqq-TddCgUI5j4v4wD3qI6P5NLhpd4"); // <-- put your bot token between the ""
-// You can now register listeners on your bot object `bot`.
-// grammY will call the listeners when users send messages to your bot.
-// Handle the /start command.
-bot.command("bind", (ctx) => ctx.reply("Please provide your address"));
 bot.command("start", (ctx) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a, _b;
-    console.log(ctx, (_a = ctx.update.message) === null || _a === void 0 ? void 0 : _a.entities);
-    const tgId = (_b = ctx.update.message) === null || _b === void 0 ? void 0 : _b.from.id;
+    var _a;
+    const tgId = (_a = ctx.update.message) === null || _a === void 0 ? void 0 : _a.from.id;
     const address = ctx.match;
-    console.log(tgId, address);
     if (tgId && address) {
+        ctx.reply(`Bukle up! You're about to start your adventure on Cyberland!`);
         const res = yield linkTelegramWithAddress(tgId, address);
         if (res.success) {
             ctx.reply("Binding successful!");
@@ -54,18 +64,21 @@ bot.command("start", (ctx) => __awaiter(void 0, void 0, void 0, function* () {
             ctx.reply(res.msg);
         }
     }
+    else {
+        ctx.reply("Please go to https://cybermon.xyz to link your Telegram account");
+    }
 }));
 bot.command("call", (ctx) => __awaiter(void 0, void 0, void 0, function* () {
-    var _c;
+    var _b;
     console.log(ctx.message);
     ctx.reply("Hold on, calling your cybermon... 💫");
-    const tgId = (_c = ctx.update.message) === null || _c === void 0 ? void 0 : _c.from.id;
+    const tgId = (_b = ctx.update.message) === null || _b === void 0 ? void 0 : _b.from.id;
     if (tgId) {
         const res = yield checkCybermon(tgId);
         if (res.data.cybermon_count) {
             const cybermon = res.data.cybermons[0];
-            yield ctx.replyWithPhoto("https://i.pinimg.com/736x/4b/7f/43/4b7f43b8f360f547141203ffa3500682.jpg", {
-                caption: `Mon Status:\nName: ${cybermon.name}\nLevel: ${cybermon.level}\nEnergy: ${cybermon.energy}\n`,
+            yield ctx.replyWithPhoto(cybermon.picture, {
+                caption: `Name: ${cybermon.name}\nLevel: ${cybermon.level}\nEnergy: ${cybermon.energy}\n`,
             });
         }
         else {
@@ -76,7 +89,24 @@ bot.command("call", (ctx) => __awaiter(void 0, void 0, void 0, function* () {
     // ctx.replyWithSticker();
 }));
 bot.command("feed", (ctx) => __awaiter(void 0, void 0, void 0, function* () {
-    ctx.reply("Yum yum");
+    var _c;
+    const tgId = (_c = ctx.update.message) === null || _c === void 0 ? void 0 : _c.from.id;
+    if (tgId) {
+        ctx.reply("Dinner's ready! Feeding your cybermon... 🍔");
+        const res = yield checkCybermon(tgId);
+        if (res.data.cybermon_count) {
+            const cybermon = res.data.cybermons[0];
+            const feedRes = yield feedCybermon(cybermon.id);
+            console.log("feedres", feedRes);
+            if (feedRes.data.feed_success) {
+                ctx.reply("😋 Yum yum");
+                const cybermon = feedRes.data.cybermon;
+                yield ctx.replyWithPhoto(cybermon.picture, {
+                    caption: `Name: ${cybermon.name}\nLevel: ${cybermon.level}\nEnergy: ${cybermon.energy}\n`,
+                });
+            }
+        }
+    }
 }));
 bot.command("battle", (ctx) => __awaiter(void 0, void 0, void 0, function* () {
     ctx.reply("🚧 Mon Battle is coming soon! 🏗️");
